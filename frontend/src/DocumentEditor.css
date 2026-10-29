@@ -1,0 +1,108 @@
+
+.editor-page {
+  min-height: 100vh;
+  background: #0b1020;
+  color: #e8eaf2;
+}
+
+.editor-topbar {
+  min-height: 64px;
+  padding: 12px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #29314a;
+}
+
+.back-button,
+.editor-toolbar button {
+  padding: 9px 12px;
+  border: 1px solid #353d58;
+  border-radius: 7px;
+  color: #e8eaf2;
+  background: #171e32;
+  cursor: pointer;
+}
+
+.save-status {
+  color: #8cdbb2;
+  font-size: 12px;
+}
+
+.editor-main {
+  width: min(850px, 90%);
+  margin: 40px auto;
+}
+
+.document-title-input {
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 10px 0;
+  border: 0;
+  outline: 0;
+  color: #f1f2fa;
+  background: transparent;
+  font: inherit;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #29314a;
+  border-radius: 10px 10px 0 0;
+  background: #151b2d;
+}
+
+.editor-toolbar button.active {
+  border-color: #8178ff;
+  background: #373064;
+}
+
+.editor-toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editor-paper {
+  min-height: 400px;
+  padding: 28px;
+  border: 1px solid #29314a;
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  background: #11182a;
+}
+
+.editor-content {
+  min-height: 350px;
+  outline: none;
+  color: #dce1ef;
+  line-height: 1.8;
+}
+
+.editor-content p {
+  margin: 0 0 12px;
+}
+
+.editor-content h2 {
+  margin: 22px 0 12px;
+}
+
+.editor-content ul {
+  padding-left: 24px;
+}
+
+@media (max-width: 500px) {
+  .editor-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .editor-paper {
+    padding: 18px;
+  }
+}
