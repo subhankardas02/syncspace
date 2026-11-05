@@ -1,108 +1,175 @@
 
 .editor-page {
   min-height: 100vh;
-  background: #0b1020;
-  color: #e8eaf2;
+  background: #f4f4f7;
+  color: #252631;
+  font-family: 'Inter', sans-serif;
 }
 
-.editor-topbar {
-  min-height: 64px;
-  padding: 12px 5%;
+/* Header */
+
+.editor-header {
+  min-height: 68px;
+  padding: 12px 6%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid #29314a;
+  gap: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5eb;
 }
 
-.back-button,
-.editor-toolbar button {
-  padding: 9px 12px;
-  border: 1px solid #353d58;
-  border-radius: 7px;
-  color: #e8eaf2;
-  background: #171e32;
+.editor-header button {
+  padding: 9px 14px;
+  border: 1px solid #e1e0eb;
+  border-radius: 8px;
+  background: #f8f8fb;
+  color: #5148c5;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-.save-status {
-  color: #8cdbb2;
-  font-size: 12px;
+.editor-header button:hover {
+  background: #efedff;
 }
 
-.editor-main {
-  width: min(850px, 90%);
-  margin: 40px auto;
+/* Editor workspace */
+
+.editor-container {
+  width: calc(100% - 40px);
+  max-width: 900px;
+  min-height: 650px;
+  margin: 38px auto;
+  padding: 48px 65px;
+  background: #ffffff;
+  border: 1px solid #e4e4eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(35, 35, 65, 0.06);
 }
 
-.document-title-input {
+/* Document title */
+
+.editor-title {
   width: 100%;
-  margin-bottom: 24px;
-  padding: 10px 0;
-  border: 0;
-  outline: 0;
-  color: #f1f2fa;
+  margin-bottom: 28px;
+  padding: 8px 0 18px;
+  border: none;
+  border-bottom: 1px solid #eeeeF2;
+  outline: none;
   background: transparent;
-  font: inherit;
-  font-size: clamp(28px, 5vw, 42px);
+  color: #252631;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 36px;
   font-weight: 700;
+  letter-spacing: -1.2px;
 }
+
+.editor-title::placeholder {
+  color: #b8b8c2;
+}
+
+/* Toolbar */
 
 .editor-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid #29314a;
-  border-radius: 10px 10px 0 0;
-  background: #151b2d;
+  align-items: center;
+  gap: 7px;
+  padding: 11px;
+  margin-bottom: 30px;
+  background: #f6f6fa;
+  border: 1px solid #e9e8f0;
+  border-radius: 9px;
 }
 
-.editor-toolbar button.active {
-  border-color: #8178ff;
-  background: #373064;
+.editor-toolbar button {
+  min-width: 36px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #555568;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.editor-toolbar button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.editor-toolbar button:hover {
+  background: #ffffff;
+  border-color: #e5e2ff;
+  color: #5148c5;
 }
 
-.editor-paper {
-  min-height: 400px;
-  padding: 28px;
-  border: 1px solid #29314a;
-  border-top: 0;
-  border-radius: 0 0 10px 10px;
-  background: #11182a;
-}
+/* Writing area */
 
 .editor-content {
-  min-height: 350px;
+  min-height: 450px;
+  padding: 5px 2px;
   outline: none;
-  color: #dce1ef;
-  line-height: 1.8;
+  color: #383844;
+  font-size: 15px;
+  line-height: 1.9;
 }
 
-.editor-content p {
-  margin: 0 0 12px;
+.editor-content:focus {
+  outline: none;
+}
+
+.editor-content h1,
+.editor-content h2,
+.editor-content h3 {
+  color: #252631;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.editor-content h1 {
+  font-size: 30px;
 }
 
 .editor-content h2 {
-  margin: 22px 0 12px;
+  font-size: 24px;
 }
 
-.editor-content ul {
-  padding-left: 24px;
+.editor-content p {
+  margin: 12px 0;
 }
 
-@media (max-width: 500px) {
-  .editor-topbar {
-    align-items: flex-start;
-    flex-direction: column;
+.editor-content ul,
+.editor-content ol {
+  padding-left: 25px;
+}
+
+.editor-content blockquote {
+  margin: 20px 0;
+  padding: 12px 18px;
+  border-left: 3px solid #635bdb;
+  border-radius: 0 6px 6px 0;
+  background: #f5f4ff;
+  color: #666477;
+}
+
+.editor-content a {
+  color: #635bdb;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .editor-container {
+    width: calc(100% - 24px);
+    margin: 18px auto;
+    padding: 25px 20px;
   }
 
-  .editor-paper {
-    padding: 18px;
+  .editor-title {
+    font-size: 27px;
+  }
+
+  .editor-header {
+    padding: 12px 16px;
   }
 }

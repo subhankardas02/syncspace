@@ -1,87 +1,192 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DocumentEditor from "./DocumentEditor";
+import AuthPage from "./AuthPage";
+import {
+  getDocuments,
+  createDocument as createDocumentAPI,
+  updateDocument as updateDocumentAPI,
+  deleteDocument,
+  type Document,
+} from "./services/documentService";
 import "./App.css";
 
-type DocumentItem = {
-  id: number;
-  title: string;
-  content: string;
-  updated: string;
-};
-
-const STORAGE_KEY = "syncspace-documents";
-
-const initialDocuments: DocumentItem[] = [
-  {
-    id: 1,
-    title: "Welcome to SyncSpace",
-    content: "<h2>Welcome!</h2><p>Start writing your ideas here.</p>",
-    updated: "Just now",
-  },
-  {
-    id: 2,
-    title: "Project Planning",
-    content: "<h2>Project plan</h2><p>Write your next big idea here.</p>",
-    updated: "Yesterday",
-  },
-];
-
-function loadDocuments(): DocumentItem[] {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) as DocumentItem[] : initialDocuments;
-  } catch {
-    return initialDocuments;
-  }
-}
-
 function App() {
-  const [documents, setDocuments] = useState<DocumentItem[]>(loadDocuments);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("syncspace_token")
+  );
+
+  const [userEmail, setUserEmail] = useState<string | null>(
+    localStorage.getItem("syncspace_email")
+  );
+
+  // Keep track of pending save timers.
+  const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+
+  // Handle successful login.
+  function handleLogin(token: string, email: string) {
+    localStorage.setItem("syncspace_token", token);
+    localStorage.setItem("syncspace_email", email);
+
+    setToken(token);
+    setUserEmail(email);
+    setLoading(true);
+    setError("");
+  }
+
+  // Handle logout.
+  function handleLogout() {
+    localStorage.removeItem("syncspace_token");
+    localStorage.removeItem("syncspace_email");
+
+    setToken(null);
+    setUserEmail(null);
+    setDocuments([]);
+    setActiveId(null);
+    setLoading(false);
+    setError("");
+
+    Object.values(saveTimers.current).forEach(clearTimeout);
+    saveTimers.current = {};
+  }
+
+  // Load documents whenever the user logs in.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
-  }, [documents]);
+    if (!token) {
+      setDocuments([]);
+      setLoading(false);
+      return;
+    }
+
+    async function loadDocuments() {
+      try {
+        setError("");
+        const data = await getDocuments();
+        setDocuments(data);
+      } catch (err) {
+        setError("Could not load documents. Please check your login and backend.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDocuments();
+  }, [token]);
 
   const activeDocument = documents.find((doc) => doc.id === activeId);
 
-  const createDocument = () => {
-    const newDocument: DocumentItem = {
-      id: Date.now(),
-      title: "Untitled document",
-      content: "<p>Start writing here...</p>",
-      updated: "Just now",
-    };
-    setDocuments((previous) => [newDocument, ...previous]);
-    setActiveId(newDocument.id);
+  // Create a document in PostgreSQL.
+  const createDocument = async () => {
+    try {
+      setError("");
+
+      const newDocument = await createDocumentAPI(
+        "Untitled document",
+        "<p>Start writing here...</p>"
+      );
+
+      setDocuments((previous) => [newDocument, ...previous]);
+      setActiveId(newDocument.id);
+    } catch (err) {
+      setError("Could not create the document.");
+    }
   };
 
-  const updateDocument = (id: number, changes: Partial<DocumentItem>) => {
+  // Delete a document.
+  const handleDeleteDocument = async (id: number) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this document?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteDocument(id);
+
+      setDocuments((previous) =>
+        previous.filter((doc) => doc.id !== id)
+      );
+
+      setError("");
+    } catch (err) {
+      setError("Could not delete the document.");
+    }
+  };
+
+  // Update document locally and save after 700ms.
+  const updateDocument = (
+    id: number,
+    changes: Partial<Pick<Document, "title" | "content">>
+  ) => {
+    const currentDocument = documents.find((doc) => doc.id === id);
+    if (!currentDocument) return;
+
+    const updatedDocument = { ...currentDocument, ...changes };
+
     setDocuments((previous) =>
       previous.map((doc) =>
-        doc.id === id ? { ...doc, ...changes, updated: "Just now" } : doc
+        doc.id === id ? updatedDocument : doc
       )
     );
+
+    const existingTimer = saveTimers.current[id];
+
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
+
+    saveTimers.current[id] = setTimeout(async () => {
+      try {
+        await updateDocumentAPI(
+          id,
+          updatedDocument.title,
+          updatedDocument.content
+        );
+        setError("");
+      } catch (err) {
+        setError("Could not save changes. Please check your backend.");
+      }
+    }, 700);
   };
 
+  // Show login/register page when logged out.
+  if (!token) {
+    return <AuthPage onLogin={handleLogin} />;
+  }
+
+  // Show loading screen.
+  if (loading) {
+    return <div className="app">Loading your documents...</div>;
+  }
+
+  // Show document editor.
   if (activeDocument) {
     return (
-      <DocumentEditor
-        key={activeDocument.id}
-        title={activeDocument.title}
-        content={activeDocument.content}
-        onTitleChange={(title) =>
-          updateDocument(activeDocument.id, { title })
-        }
-        onContentChange={(content) =>
-          updateDocument(activeDocument.id, { content })
-        }
-        onBack={() => setActiveId(null)}
-      />
+      <>
+        {error && <p className="error-message">{error}</p>}
+
+        <DocumentEditor
+          key={activeDocument.id}
+          title={activeDocument.title}
+          content={activeDocument.content}
+          onTitleChange={(title) =>
+            updateDocument(activeDocument.id, { title })
+          }
+          onContentChange={(content) =>
+            updateDocument(activeDocument.id, { content })
+          }
+          onBack={() => setActiveId(null)}
+        />
+      </>
     );
   }
 
+  // Show dashboard.
   return (
     <div className="app">
       <header className="topbar">
@@ -89,7 +194,13 @@ function App() {
           <div className="brand-icon">S</div>
           <span>SyncSpace</span>
         </div>
-        <div className="user-avatar">S</div>
+
+        <div className="profile-section">
+          <span className="user-email">{userEmail}</span>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </header>
 
       <main className="main">
@@ -99,10 +210,13 @@ function App() {
           <p className="subtitle">
             Create documents, organize your thoughts, and collaborate in real time.
           </p>
+
           <button className="create-button" onClick={createDocument}>
             <span>+</span> Create document
           </button>
         </section>
+
+        {error && <p className="error-message">{error}</p>}
 
         <section className="documents">
           <div className="section-heading">
@@ -114,14 +228,28 @@ function App() {
             {documents.map((document) => (
               <article className="document-card" key={document.id}>
                 <div className="document-icon">▤</div>
+
                 <h3>{document.title}</h3>
-                <p>Edited {document.updated}</p>
-                <button
-                  className="open-button"
-                  onClick={() => setActiveId(document.id)}
-                >
-                  Open document →
-                </button>
+
+                <p>
+                  Edited {new Date(document.updatedAt).toLocaleString()}
+                </p>
+
+                <div className="document-actions">
+                  <button
+                    className="open-button"
+                    onClick={() => setActiveId(document.id)}
+                  >
+                    Open document →
+                  </button>
+
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDeleteDocument(document.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </article>
             ))}
           </div>

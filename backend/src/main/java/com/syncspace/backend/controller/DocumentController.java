@@ -1,13 +1,17 @@
 
 package com.syncspace.backend.controller;
 
+import com.syncspace.backend.AppUser;
 import com.syncspace.backend.Document;
 import com.syncspace.backend.repository.DocumentRepository;
+import com.syncspace.backend.repository.UserRepository;
 
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -15,38 +19,67 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
 
-    public DocumentController(DocumentRepository documentRepository) {
+    public DocumentController(
+            DocumentRepository documentRepository,
+            UserRepository userRepository) {
         this.documentRepository = documentRepository;
+        this.userRepository = userRepository;
     }
 
-    // Get all documents
+    private AppUser getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Authenticated user not found"));
+    }
+
     @GetMapping
-    public List<Document> getAllDocuments() {
-        return documentRepository.findAll();
+    public List<Document> getAllDocuments(Authentication authentication) {
+        AppUser user = getCurrentUser(authentication);
+
+        return documentRepository.findByOwnerId(user.getId());
     }
 
-    // Get a document by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Document> getDocumentById(@PathVariable Long id) {
-        return documentRepository.findById(id)
+    public ResponseEntity<Document> getDocumentById(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        AppUser user = getCurrentUser(authentication);
+
+        return documentRepository
+                .findByIdAndOwnerId(id, user.getId())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Create a new document
     @PostMapping
-    public Document createDocument(@RequestBody Document document) {
-        return documentRepository.save(document);
+    public ResponseEntity<?> createDocument(
+            @RequestBody Document document,
+            Authentication authentication) {
+
+        AppUser user = getCurrentUser(authentication);
+
+        document.setOwner(user);
+
+        Document savedDocument = documentRepository.save(document);
+
+        return ResponseEntity.ok(savedDocument);
     }
 
-    // Update an existing document
     @PutMapping("/{id}")
-    public ResponseEntity<Document> updateDocument(
+    public ResponseEntity<?> updateDocument(
             @PathVariable Long id,
-            @RequestBody Document updatedDocument) {
+            @RequestBody Document updatedDocument,
+            Authentication authentication) {
 
-        return documentRepository.findById(id)
+        AppUser user = getCurrentUser(authentication);
+
+        return documentRepository
+                .findByIdAndOwnerId(id, user.getId())
                 .map(document -> {
                     document.setTitle(updatedDocument.getTitle());
                     document.setContent(updatedDocument.getContent());
@@ -58,16 +91,19 @@ public class DocumentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Delete a document
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDocument(
+            @PathVariable Long id,
+            Authentication authentication) {
 
-        if (!documentRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
+        AppUser user = getCurrentUser(authentication);
 
-        documentRepository.deleteById(id);
-
-        return ResponseEntity.noContent().build();
+        return documentRepository
+                .findByIdAndOwnerId(id, user.getId())
+                .map(document -> {
+                    documentRepository.delete(document);
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
