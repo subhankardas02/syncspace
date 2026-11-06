@@ -80,3 +80,33 @@ export async function deleteDocument(id: number): Promise<void> {
         throw new Error("Failed to delete document");
     }
 }
+
+
+export async function shareDocument(
+    documentId: number,
+    email: string,
+    permission: "EDITOR" | "VIEWER"
+): Promise<{ message: string; email: string; permission: string }> {
+
+    const response = await fetch(
+        `${API_URL}/${documentId}/shares`,
+        {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                email,
+                permission,
+            }),
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || "Failed to share document"
+        );
+    }
+
+    return data;
+}

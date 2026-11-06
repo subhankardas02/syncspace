@@ -173,3 +173,308 @@
     padding: 12px 16px;
   }
 }
+
+/* Live collaboration cursor */
+.collaboration-carets__caret {
+  position: relative;
+  border-left: 2px solid #2563eb;
+  border-right: 1px solid #2563eb;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  word-break: normal;
+}
+
+/* Username above the cursor */
+.collaboration-carets__label {
+  position: absolute;
+  top: -1.5em;
+  left: -1px;
+  padding: 2px 6px;
+  border-radius: 4px 4px 4px 0;
+  background-color: #2563eb;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Active collaborators */
+.active-users {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+}
+
+.active-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border: 2px solid white;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+/* Live collaborator cursors */
+.collaboration-carets__caret {
+  position: relative;
+  border-left: 2px solid;
+  border-right: 1px solid;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+}
+
+/* Collaborator name above cursor */
+.collaboration-carets__label {
+  position: absolute;
+  top: -1.5em;
+  left: -1px;
+  padding: 2px 6px;
+  border-radius: 4px 4px 4px 0;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Share button */
+.share-button {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #7c3aed;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.share-button:hover {
+    background: #6d28d9;
+}
+
+/* Share panel */
+.share-panel {
+    position: absolute;
+    top: 65px;
+    right: 20px;
+    z-index: 100;
+    width: 320px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.share-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.share-panel-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.share-panel p {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.share-close-button {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.share-email-input,
+.share-permission-select {
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.share-submit-button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 11px;
+    border: none;
+    border-radius: 7px;
+    background: #7c3aed;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.share-submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.share-success {
+    color: #15803d !important;
+}
+
+.share-error {
+    color: #dc2626 !important;
+}
+
+
+/* Improved editor toolbar */
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.editor-toolbar button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #374151;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.editor-toolbar button:hover {
+    background: #f3f4f6;
+}
+
+.editor-toolbar button.is-active {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: #e5e7eb;
+    margin: 0 4px;
+}
+
+/* Share button */
+.share-button {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #7c3aed;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.share-button:hover {
+    background: #6d28d9;
+}
+
+/* Share panel */
+.share-panel {
+    position: absolute;
+    top: 65px;
+    right: 20px;
+    z-index: 100;
+    width: 320px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.share-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.share-panel-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.share-panel p {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.share-close-button {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.share-email-input,
+.share-permission-select {
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.share-submit-button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 11px;
+    border: none;
+    border-radius: 7px;
+    background: #7c3aed;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.share-submit-button:hover {
+    background: #6d28d9;
+}
+
+.share-submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.share-success {
+    color: #15803d !important;
+}
+
+.share-error {
+    color: #dc2626 !important;
+}

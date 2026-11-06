@@ -69,7 +69,9 @@ function App() {
         const data = await getDocuments();
         setDocuments(data);
       } catch (err) {
-        setError("Could not load documents. Please check your login and backend.");
+        setError(
+          "Could not load documents. Please check your login and backend."
+        );
       } finally {
         setLoading(false);
       }
@@ -172,6 +174,8 @@ function App() {
 
         <DocumentEditor
           key={activeDocument.id}
+          documentId={activeDocument.id}
+          userName={userEmail ?? "Anonymous"}
           title={activeDocument.title}
           content={activeDocument.content}
           onTitleChange={(title) =>
